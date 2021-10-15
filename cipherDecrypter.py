@@ -1,65 +1,63 @@
-
-#userSentence = input("What would you like decrypt? ").lower()
-#print(userSentence)
-#
-#userSentence = userSentence.split(" ")
-#finalSentence = []
-#
-#i = 0 
-#while i < len(userSentence): # Loop through the words 
-#	p = 0
-#	finalSentence.append([])
-#	
-#	while p < len(userSentence[i]): # Loop through the letters
-#		print("#DEBUG P", finalSentence)
-#		x = 0
-#		print(p)
-#		finalSentence[i].append([])
-#		
-#		while x < 26: # Calculate all cipher posibilities 
-#			print (userSentence[i][p], x)
-#			finalSentence[i][p] += chr(ord(userSentence[i][p]) + x)#THIS NEEDS TO BE SEPARATED SO YOU DO NOT OVERFLOW
-#			x += 1
-#	
-#		p += 1
-#	
-#	print(userSentence[i])
-#	i += 1 
-#	
-#print(finalSentence)
-#
-
-
 def cipherSentence(sentence):
 	sentenceVariations = []
 	words = sentence.split(" ")
 	
-	print(words)
+	# Loops through all the words in a sentence 
 	counter = 0 
 	for word in words:
 		sentenceVariations.append([])
 		
+		# Finds all cipher posibilities of the words
 		i = 0 
 		while i < 26: 
-			
-		sentenceVariations[counter].append(cipherWord(word))
-		counter =+ 1
-		
+			sentenceVariations[counter].append(cipherWord(word, i))
+			i += 1
+		counter += 1
+	
+	leaderboard = rankWords(sentenceVariations)
 	return sentenceVariations
 	
 	
-def cipherWord(word):
-	
-	for x in word: 
-		print(ord(x))
+# Ciphers a singular word
+def cipherWord(word, i):
+	finalWord = ""
+	for x in word:
+		asc = ord(x)
+		asc += i
+		if asc > 122:
+			asc -= 26
+		
+		finalWord = finalWord + chr(asc)
 	 
-	return word
+	return finalWord
 	
 	
-def dictionaryCheck(word):
-	print(dictionary)
+def searchDictionary(word):
+	if ("\n" + word + "\n") in open('british-english').read(): # Checks whether the word exists (must have its own line) 
+		return True
+	else:
+		return False
+
+def rankWords(sentenceVariations):
+	ratings = []
+	for variations in sentenceVariations:
+		score = 0
+		
+		pos =  0 
+		while pos < len(variations):
+			ratings.append(0)
+			if searchDictionary(variations[pos]): 
+				ratings[-1] =+ 1
+				print(ratings)
+				print("@", sentence)				
+				#print(variations[pos], searchDictionary(variations[pos]))
+			
+			pos += 1
+		 
+	return sentenceVariations
 	
 
-sentence = input("What sentence would you like to decrypt? ").lower()
+
+sentence = input("What sentence would you like to decrypt? ").lower() # handles all words as lowercase
 print(cipherSentence(sentence))
 
