@@ -27,14 +27,13 @@ class Ball():
 
 myBall = Ball()
 myBall.outputData()
-myBall.draw(screen)
 
 while gameOver == False:
 	for e in event.get():
 		if e.type == QUIT: 
 			gameOver = True
 	screen.fill((255,255,255))
-	
+	myBall.draw(screen)
 	display.flip()
 	
 	time.delay(1)
