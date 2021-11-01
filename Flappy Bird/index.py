@@ -1,41 +1,60 @@
-from pygame import * 
+import time 
+import pygame 
+import random 
+import os 
 
-init()
+pygame.init() 
+pygame.font.init()
+
 width = 1200
 height = 700
-screen = display.set_mode((width, height))
+screen = pygame.display.set_mode((width, height))
+clock = pygame.time.Clock()
 
-gameOver = False 
+#character = pygame.transform.smoothscale(pygame.image.load(os.path.join('Flappy Bird/assets/character.png')), (80, 65))
+character = pygame.image.load(os.path.join('Flappy Bird/assets/character.png'))
 
-class Pipe(): 
-	def __init__(self): 
-		self.x = randint(40, 1200)
-		self.y = randint(40, 700)
-		self.dx = randint(-4, 4)
-		self.dy = randint(-4, 4)
-		if self.dx and self.dy == 0: dx = 1
-		self.radius = randint(5, 50)
-		self.colour = (250, 0, 0)
+def gameLoop(): 
+	gameExit = False
+	gamePlaying = False
+	gamePaused = False
+
+	while not gameExit:
+		screen.fill((135, 206, 235))
 		
-	def outputData(self):
-		print(self.x, self.y, self.dx, self.dy, self.radius)
-		
-	def draw(self, screen):
-		print(self.x, self.y, self.dx, self.dy, self.radius, self.colour)
-		draw.circle(screen, (255, 0, 0), (self.x, self.y), self.radius)
-		
-while gameOver == False:
-	for e in event.get():
-		if e.type == QUIT: 
-			gameOver = True
-		if e.type == KEYDOWN:
-			if e.key == K_ESC:
-				gameOver = False
-			elif e.key == K_SPACE:
-				print("SPACE")
-				
-	screen.fill((255,255,255))
-	myBall.draw(screen)
-	display.flip()
-	
-	time.delay(1)
+		# Handling inputs 
+		for e in pygame.event.get(): 
+			if e.type == pygame.QUIT:
+				gameExit = True 
+			if e.type == pygame.KEYDOWN:
+				if not gamePlaying and not gamePaused: 
+					if e.key == pygame.K_SPACE:
+						gamePlaying = True
+
+				elif gamePlaying and not gamePaused: 
+					if e.key == pygame.K_ESCAPE: 
+						gamePaused = True
+					elif e.key == pygame.K_SPACE:
+						pass
+
+				elif gamePaused:
+					if e.key == pygame.K_ESCAPE: 
+						gamePaused = False
+
+		# Handling drawings 
+		if not gamePlaying and not gamePaused:
+			print("START MENU")
+			font = pygame.font.SysFont('Comic Sans MS', 30)
+			title = font.render('Flappy Bird', False, (0, 255, 0))
+			screen.blit(title, title.get_rect(center=(width/2, height/2)))
+		else:
+			screen.blit(character, (width/2, height/2))
+			pygame.draw.rect(screen, (0, 255, 0), (0, height-50, width, 50))
+
+
+		pygame.display.update()
+		clock.tick(30)
+
+gameLoop()
+pygame.quit()
+quit()
