@@ -11,9 +11,16 @@ height = 700
 screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
-character = pygame.image.load(os.path.join('Flappy Bird/assets/character.png'))
-bottomPipe = pygame.image.load(os.path.join('Flappy Bird/assets/smallPipe.png'))
-topPipe = pygame.transform.rotate(pygame.image.load(os.path.join('Flappy Bird/assets/smallPipe.png')), 180)
+current_path = os.path.dirname(__file__) # Where your .py file is located
+assets_path = os.path.join(current_path, 'assets') # The resource folder path
+
+character = pygame.image.load(os.path.join(assets_path, 'character.png'))
+bottomPipe = pygame.image.load(os.path.join(assets_path, 'smallPipe.png'))
+topPipe = pygame.transform.rotate(pygame.image.load(os.path.join(assets_path, 'smallPipe.png')), 180)
+
+#character = pygame.image.load(os.path.join('Flappy Bird/assets/character.png'))
+#bottomPipe = pygame.image.load(os.path.join('Flappy Bird/assets/smallPipe.png'))
+#topPipe = pygame.transform.rotate(pygame.image.load(os.path.join('Flappy Bird/assets/smallPipe.png')), 180)
 
 class pipe: 
 	def __init__(self, XBiased):
@@ -40,7 +47,7 @@ def gameLoop():
 	
 	debugMode = False
 
-	cY = height/2
+	cY = height//2
 	smoothFlight = 0
 	pipes = pipe.generateOriginPipes()
 	gameXPos = 0
@@ -105,9 +112,9 @@ def gameLoop():
 		if not gamePlaying and not gamePaused:
 			font = pygame.font.SysFont('Comic Sans MS', 30)
 			title = font.render('Flappy Bird', False, (0, 255, 0))
-			screen.blit(title, title.get_rect(center=(width/2, height/2)))
+			screen.blit(title, title.get_rect(center=(width//2, height//2)))
 		elif gamePlaying and not gamePaused and not gameOver:
-			screen.blit(character, (width/2, cY))
+			screen.blit(character, (width//2, cY))
 
 			i = 0
 			while i < len(pipes): 
@@ -127,11 +134,11 @@ def gameLoop():
 		elif gamePaused:			
 			font = pygame.font.SysFont('Comic Sans MS', 30)
 			title = font.render('Currently Paused', False, (0, 255, 0))
-			screen.blit(title, title.get_rect(center=(width/2, height/2)))
+			screen.blit(title, title.get_rect(center=(width//2, height//2)))
 		elif gameOver: 
 			font = pygame.font.SysFont('Comic Sans MS', 30)
 			title = font.render('Game Over!', False, (0, 255, 0))
-			screen.blit(title, title.get_rect(center=(width/2, height/2)))
+			screen.blit(title, title.get_rect(center=(width//2, height//2)))
 
 		if debugMode: 
 			font = pygame.font.SysFont('Comic Sans MS', 30)
