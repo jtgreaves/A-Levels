@@ -24,10 +24,11 @@ topPipe = pygame.transform.rotate(pygame.image.load(os.path.join(assets_path, 's
 
 class pipe: 
 	def __init__(self, XBiased):
-		verticalOffset = random.randint(0, height//4) + height//6
+		verticalOffset = random.randint(0, height//4) + height//6 
 		self.pipeX = XBiased + random.randint(400, 550)
 		self.topPipeY = verticalOffset - topPipe.get_height() 
-		self.bottomPipeY = verticalOffset + 150
+		self.bottomPipeY = verticalOffset + random.randint(100, 175)
+		self.passed = False
 
 	def generateOriginPipes(): 
 		pipes = []
@@ -51,6 +52,7 @@ def gameLoop():
 	smoothFlight = 0
 	pipes = pipe.generateOriginPipes()
 	gameXPos = 0
+	score = 0
 
 	while not gameExit:
 		screen.fill((135, 206, 235))
@@ -75,6 +77,7 @@ def gameLoop():
 				gameOver = True 
 				print("Collision with the ground!")
 
+		
 		# Handling inputs 
 		for e in pygame.event.get(): 
 			if e.type == pygame.QUIT:
@@ -122,15 +125,23 @@ def gameLoop():
 				screen.blit(topPipe, (p.pipeX-gameXPos, p.topPipeY))
 				screen.blit(bottomPipe, (p.pipeX-gameXPos, p.bottomPipeY))
 				
+
 				if (p.pipeX-gameXPos) < -100: 
 					pipes[i] = pipe(pipes[i-1].pipeX)
 
+				if (p.pipeX-gameXPos) < (width//2) and not p.passed:
+					print("The pipe has been passed")
+					score += 50
+					p.passed = True 
 				i += 1 
 
 
 			pygame.draw.rect(screen, (0, 255, 0), (0, height-50, width, 50))
 			gameXPos += 10
-
+			
+			font = pygame.font.SysFont('Comic Sans MS', 30)
+			title = font.render(str(score), False, (0, 255, 0))
+			screen.blit(title, title.get_rect(center=(width-10, 20)))
 		elif gamePaused:			
 			font = pygame.font.SysFont('Comic Sans MS', 30)
 			title = font.render('Currently Paused', False, (0, 255, 0))
