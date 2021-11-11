@@ -18,10 +18,6 @@ character = pygame.image.load(os.path.join(assets_path, 'character.png'))
 bottomPipe = pygame.image.load(os.path.join(assets_path, 'smallPipe.png'))
 topPipe = pygame.transform.rotate(pygame.image.load(os.path.join(assets_path, 'smallPipe.png')), 180)
 
-#character = pygame.image.load(os.path.join('Flappy Bird/assets/character.png'))
-#bottomPipe = pygame.image.load(os.path.join('Flappy Bird/assets/smallPipe.png'))
-#topPipe = pygame.transform.rotate(pygame.image.load(os.path.join('Flappy Bird/assets/smallPipe.png')), 180)
-
 class pipe: 
 	def __init__(self, XBiased):
 		verticalOffset = random.randint(0, height//4) + height//6 
@@ -119,6 +115,7 @@ def gameLoop():
 		elif gamePlaying and not gamePaused and not gameOver:
 			screen.blit(character, (width//2, cY))
 
+			# Render pipes 
 			i = 0
 			while i < len(pipes): 
 				p = pipes[i] 
@@ -131,9 +128,9 @@ def gameLoop():
 
 				if (p.pipeX-gameXPos) < (width//2) and not p.passed:
 					print("The pipe has been passed")
-					score += 50
+					score += 1
 					p.passed = True 
-				i += 1 
+	 			i += 1 
 
 
 			pygame.draw.rect(screen, (0, 255, 0), (0, height-50, width, 50))
@@ -141,7 +138,7 @@ def gameLoop():
 			
 			font = pygame.font.SysFont('Comic Sans MS', 30)
 			title = font.render(str(score), False, (0, 255, 0))
-			screen.blit(title, title.get_rect(center=(width-10, 20)))
+			screen.blit(title, title.get_rect(center=(width//2, 20)))
 		elif gamePaused:			
 			font = pygame.font.SysFont('Comic Sans MS', 30)
 			title = font.render('Currently Paused', False, (0, 255, 0))
