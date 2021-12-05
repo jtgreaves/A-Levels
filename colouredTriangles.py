@@ -49,3 +49,5 @@ while pos < len(triangle):
 
     print(line)
     pos += 1
+    
+input()

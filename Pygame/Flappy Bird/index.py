@@ -13,6 +13,7 @@ clock = pygame.time.Clock()
 
 current_path = os.path.dirname(__file__) # Where your .py file is located
 assets_path = os.path.join(current_path, 'assets') # The resource folder path
+font = pygame.font.SysFont('Comic Sans MS', 30)
 
 character = pygame.image.load(os.path.join(assets_path, 'character.png'))
 bottomPipe = pygame.image.load(os.path.join(assets_path, 'smallPipe.png'))
@@ -109,7 +110,7 @@ def gameLoop():
 
 		# Handling drawings 
 		if not gamePlaying and not gamePaused:
-			font = pygame.font.SysFont('Comic Sans MS', 30)
+			
 			title = font.render('Flappy Bird', False, (0, 255, 0))
 			screen.blit(title, title.get_rect(center=(width//2, height//2)))
 		elif gamePlaying and not gamePaused and not gameOver:
@@ -136,26 +137,26 @@ def gameLoop():
 			pygame.draw.rect(screen, (0, 255, 0), (0, height-50, width, 50))
 			gameXPos += 10
 			
-			font = pygame.font.SysFont('Comic Sans MS', 30)
+			
 			title = font.render(str(score), False, (0, 255, 0))
 			screen.blit(title, title.get_rect(center=(width//2, 20)))
 		elif gamePaused:			
-			font = pygame.font.SysFont('Comic Sans MS', 30)
+			
 			title = font.render('Currently Paused', False, (0, 255, 0))
 			screen.blit(title, title.get_rect(center=(width//2, height//2)))
 		elif gameOver: 
-			font = pygame.font.SysFont('Comic Sans MS', 30)
+			
 			title = font.render('Game Over!', False, (0, 255, 0))
 			screen.blit(title, title.get_rect(center=(width//2, height//2)))
 
 		if debugMode: 
-			font = pygame.font.SysFont('Comic Sans MS', 30)
+			
 			title = font.render(("PlayerY " + str(cY) + " | GameXPos " + str(gameXPos)), False, (255, 0, 0))
 			screen.blit(title, (100, 100))
 
 			x = 0 
 			while x < len(pipes): 
-				font = pygame.font.SysFont('Comic Sans MS', 30)
+				
 				title = font.render((str(x) + ": " + str(pipes[x].pipeX) + " | " + str(pipes[x].topPipeY) + " | " + str(pipes[x].bottomPipeY)), False, (255, 0, 0))
 				screen.blit(title, (100, 50*(x+1)+100))
 				x+=1
