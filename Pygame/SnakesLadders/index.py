@@ -26,6 +26,24 @@ class snakes:
     def __init__(self):
         pass
 
+def addSnakes(number, board): 
+	numberAdded = 0 
+	while numberAdded < number: 
+		place = random.randint(0, len(board))
+		length = -random.randint(3, 15)
+		if (place+length) > 0 and board[place] == 0 and board[place+length] == 0:
+			board[place] = length
+			numberAdded += 1
+
+def addLadders(number, board): 
+	numberAdded = 0 
+	while numberAdded < number: 
+		place = random.randint(0, len(board))
+		length = random.randint(3, 10)
+		if (place+length) < 100 and board[place] == 0 and board[place+length] == 0:
+			board[place] = length
+			numberAdded += 1
+
 def positionCentre(pos): 
 	if (pos <= 9) or (pos >= 20 and pos <= 29) or (pos >= 40 and pos <= 49) or (pos >= 60 and pos <= 69) or (pos >= 80 or pos <= 80): row = 1 
 	else: row = 2
@@ -39,23 +57,43 @@ def positionCentre(pos):
 	
 	
 	return (x, y)
- 
+
+def takeTurn(board, players, player): # Returns the next player to take a turn
+	roll = random.randint(0, 6)	
+	newPlace = players[player] + roll + board[players[player] + roll]
+	players[player] = newPlace
+
+	return switchPlayer(player, players)
+
+def switchPlayer(player, players): 
+	player += 1
+	if player >= len(players): player = 0
+	return player 
+
+
 
 
 
 def gameLoop(): 
 	gameExit = False
-	grid = [0 for i in range(100)]
+	board = [0 for i in range(100)]
+	players = [0 for i in range(2)]
+	playerColours = [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for i in range(len(players))]
 
-	snakes = [[85, 20]]
-
+	player = 0
+	addSnakes(5, board)
+	addLadders(5, board)
+	
 	while not gameExit:
 		for e in pygame.event.get(): 
 			if e.type == pygame.QUIT: 
-				exitGame = True 
-
+				gameExit = True
+			if e.type == pygame.KEYDOWN: 
+				if e.key == pygame.K_SPACE: 
+					player = takeTurn(board, players, player)
+	
 		screen.fill((255, 255, 255))
-
+		
 		# Draw the grid
 		pygame.draw.rect(screen,(0,0,0),(0,0,5,855))
 		pygame.draw.rect(screen,(0,0,0),(85,0,5,855))
@@ -81,16 +119,19 @@ def gameLoop():
 		pygame.draw.rect(screen,(0,0,0),(0,765,855,5))
 		pygame.draw.rect(screen,(0,0,0),(0,850,855,5))
 
+		place = 0 
+		while place < len(board):
+			if board[place] != 0:
+				pos1 = positionCentre(place)
+				pos2 = positionCentre(place-board[place])
+				if board[place] < 0: pygame.draw.line(screen, (255,0,0), pos1, pos2, 5)
+				else: pygame.draw.line(screen, (0,255,0), pos1, pos2, 5)
+			place += 1
 
-		for snake in snakes:
-			pos1 = positionCentre(snake[0])
-			pos2 = positionCentre(snake[1])
-
-			print(pos1, pos2)
-			
-			
-			pygame.draw.line(screen, (0,0,0), pos1, pos2, 5)
-
+		plyr = 0 
+		while plyr < len(players):
+			pygame.draw.circle(screen, playerColours[plyr], positionCentre(players[plyr]), 5)
+			plyr += 1 
 
 		pygame.display.update()
 		clock.tick(100)
