@@ -13,14 +13,37 @@ assets_path = os.path.join(current_path, 'assets')
 invaders = []
 
 class Alien:
+	dx = 5
 	def __init__(self, x, y, alienType):
 		self.imageLoaded = pygame.transform.scale(pygame.image.load(os.path.join(assets_path, alienType+'.png')), (35, 35))
 		self.x = x
 		self.y = y
 		self.dead = False
-			
-	def draw(self):
+	
+	
+	def update(self):
+		if self.x > 1100 or self.x < 50:
+			Alien.dx *= -1
+			for i in invaders: 
+				i.y += 25
+				i.x += Alien.dx
+				print(i.x)
+				
+		else:
+			self.x += Alien.dx
+		 
 		if self.dead == False: screen.blit(self.imageLoaded, (self.x, self.y))
+				
+		return dx 
+		
+
+
+class Player: 	
+	def __init__(self): 
+		self.imageLoaded = pygame.transform.scale(pygame.image.load(os.path.join(assets_path, 'ship.png')), (35, 35)) 
+		self.x = width//2
+		self.dx = 0
+		self.bullet = []
 
 def createInvaders(number):
 	n = 0 
@@ -28,7 +51,7 @@ def createInvaders(number):
 	y = 50 
 	for i in range(number):
 		if n >= 15: # After 15 characters spawned, change rows
-			y += 75
+			y += 50
 			x = 50
 			n = 0 
 		
@@ -37,10 +60,8 @@ def createInvaders(number):
 		n += 1
 
 		
-createInvaders(50) 
-print(invaders)
-
-dx = 10
+createInvaders(21) 
+dx = 8
 
 endProgram = False
 while endProgram == False:
@@ -48,16 +69,11 @@ while endProgram == False:
 		if e.type == pygame.QUIT:
 			endProgram = True
 
-	screen.fill((0, 0, 0))
+	screen.fill((0, 0, 0))		
+	
+	for i in invaders: i.update()
+		
 
-	
-	for i in invaders: 
-		i.draw()
-		
-		if i.x > 1100 or i.x < 100: dx *= -1  
-		i.x += dx 
-		
-	
 	pygame.display.update()
 	clock.tick(30)
 	
