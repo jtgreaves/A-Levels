@@ -11,6 +11,7 @@ clock = pygame.time.Clock()
 
 current_path = os.path.dirname(__file__)
 assets_path = os.path.join(current_path, 'assets')
+heartImage =  pygame.image.load(os.path.join(assets_path, 'heart.png'))
 
 class Alien:
 	dx = 5
@@ -24,7 +25,7 @@ class Alien:
 		self.dead = False
 
 
-	def update(self):
+	def update(self, player):
 		if self.dead == False:
 			if (self.x + Alien.dx) >= 1100 or (self.x + Alien.dx) <= 50: Alien.change = True
 
@@ -36,12 +37,13 @@ class Alien:
 					player.bullets.remove(b)
 					self.dead = True
 
-			if self.y > 650: screen.fill((255,0,0)) # Check whether they've reached the player
+			if self.y > 650: 
+				player.kill(player.lives)
 
 			chance = random.randint(0, 1000)
 			if chance == 0: Alien.bullets.append(Bullet(self.y, (self.x + 13), 1))
 
-	def changeDirection():
+	def changeDirection(invaders):
 		Alien.dx *= -1
 		for i in invaders:
 			i.y += 25
@@ -51,7 +53,8 @@ class Alien:
 	def create(number):
 		n = 0
 		x = 50
-		y = 50
+		y = 75
+		invaders = [] 
 		for i in range(number):
 			if n >= 15: # After 15 characters spawned, change rows
 				y += 50
@@ -61,6 +64,7 @@ class Alien:
 			invaders.append(Alien(x, y, "InvaderA1"))
 			x += 50
 			n += 1
+		return invaders
 
 class Player:
 	def __init__(self):
@@ -72,14 +76,23 @@ class Player:
 
 
 	def update(self):
-		for b in self.bullets: b.update()
-
-
-		if player.x + self.dx > 55 and player.x + self.dx < 1100: self.x += self.dx
-		p = screen.blit(player.imageLoaded, (self.x, 650))
+		for b in self.bullets: b.update(self)
+		
+		if self.x + self.dx > 55 and self.x + self.dx < 1100: self.x += self.dx
+		p = screen.blit(self.imageLoaded, (self.x, 650))
 
 		for b in Alien.bullets:
-			if p.collidepoint(b.x, b.y): screen.fill((255, 0, 0))
+			if p.collidepoint(b.x, b.y): 
+				self.kill()
+				Alien.bullets.remove(b)
+		
+		if self.lives <= 0:
+			endProgram = True
+			self.lives
+		
+	def kill(self, amount=1): 
+		screen.fill((255, 0, 0))
+		self.lives -= amount
 
 class Bullet:
 	playerBullet = pygame.transform.scale(pygame.image.load(os.path.join(assets_path, 'bullet.png')), (10, 10))
@@ -90,7 +103,7 @@ class Bullet:
 		self.speed = speed
 		self.direction = direction #0 = UP; 1 = DOWN
 
-	def update(self):
+	def update(self, player):
 		if self.y > height or self.y < 0:
 			if self.direction == 1: Alien.bullets.remove(self)
 			else: player.bullets.remove(self)
@@ -100,27 +113,29 @@ class Bullet:
 		screen.blit(Bullet.playerBullet, (self.x, self.y))
 
 class Barricade: 
-	def __init__(self, start, length, h=50):
+	def __init__(self, start, length, h=25):
 		self.startPoint = start
 		self.length = length
 		self.lines = [] #Each value is the endpoint of another line 
 		
 		bias = h /(length//2)
-		print(bias)
+		backwardsCount = 0
 		for l in range(length):
 			if l < length//2: lineHeight = math.floor(h + bias*l)
-			else: lineHeight = math.floor(h + bias*(-l))
+			else: 
+				lineHeight = math.floor(h + bias*(l-backwardsCount))
+				backwardsCount += 2
 			
-			print(l, lineHeight)
 			self.lines.append([height-150, lineHeight])# [Bottom, height]
 		
-		print(self.lines)
 	
-	def create(number):	
+	def create(number):
+		barricades = [] 
 		for n in range(number): 
-			 barricades.append(Barricade(n*50+55, 50)) #Start point & length
+			 barricades.append(Barricade(n*50+55, 25)) #Start point & length
+		return barricades
 	
-	def update(self):
+	def update(self, player):
 		bias = 0
 		line = 0 
 		while line < len(self.lines):
@@ -137,61 +152,78 @@ class Barricade:
 						self.lines[line][0] -= 10
 						self.lines[line][1] -= 10
 						player.bullets.remove(b)
+				
 			bias += 7
 			line += 1  
-		
+
+class AbstractScreen:
+	def drawScreen(self, screen):
+		pass
 	
+	
+	def handleInput(self, e):
+		pass
+
+	def nextScreen(self):
+		return self
+		
+class MainScreen(AbstractScreen):
+	def __init__(self):
+		self.invaders = Alien.create(30)
+		self.barricades = Barricade.create(1)
+		self.player = Player()
+		self.frameCount = 0
+	
+	def drawScreen(self, screen):
+		screen.fill((0, 0, 0))
+		for life in range(self.player.lives):
+			screen.blit(heartImage, (10+(life*40), 10))
 			
+		if self.frameCount > 0: self.frameCount -= 1
+		for i in self.invaders: i.update(self.player)
+		if Alien.change: Alien.changeDirection(self.invaders)
+		for b in Alien.bullets: b.update(self.player)
+		for b in self.barricades: b.update(self.player)
+	
+		self.player.update()
+	
+	def handleInput(self, e):
+		keys = pygame.key.get_pressed()
+		if e.type == pygame.KEYDOWN: # Change direction if a new key is pressed
+			if e.key == pygame.K_RIGHT: self.player.dx = 7
+			if e.key == pygame.K_LEFT: self.player.dx = -7
 
+			if e.key == pygame.K_SPACE and self.frameCount == 0: 
+				self.player.bullets.append(Bullet(650, (self.player.x + 13), 0))
+				self.frameCount = 30
 
+		if e.type == pygame.KEYUP: # Changes direction when a key is released; checks opposing direction's key
+			if e.key == pygame.K_RIGHT:
+				if keys[pygame.K_LEFT] == 1: self.player.dx = -7
+				else: self.player.dx = 0
+			elif e.key == pygame.K_LEFT:
+				if keys[pygame.K_RIGHT] == 1: self.player.dx = 7
+				else: self.player.dx = 0
 
-invaders = []
-barricades = []
-player = Player()
-
-Barricade.create(1)
-Alien.create(21)
-frameCount = 0
-
+	def nextScreen(self):
+		if self.player.lives < 0:
+			return GameOverScreen()
+		return self
+			
 endProgram = False
+currentScreen = MainScreen()
+
 while endProgram == False:
 	for e in pygame.event.get():
 		if e.type == pygame.QUIT:
 			endProgram = True
-
-		keys = pygame.key.get_pressed()
-		if e.type == pygame.KEYDOWN: # Change direction if a new key is pressed
-			if e.key == pygame.K_RIGHT: player.dx = 7
-			if e.key == pygame.K_LEFT: player.dx = -7
-
-			if e.key == pygame.K_SPACE and frameCount == 0: 
-				player.bullets.append(Bullet(650, (player.x + 13), 0))
-				frameCount = 30
-
-		if e.type == pygame.KEYUP: # Changes direction when a key is released; checks opposing direction's key
-			if e.key == pygame.K_RIGHT:
-				if keys[pygame.K_LEFT] == 1: player.dx = -7
-				else: player.dx = 0
-			elif e.key == pygame.K_LEFT:
-				if keys[pygame.K_RIGHT] == 1: player.dx = 7
-				else: player.dx = 0
-
-
-
-	if frameCount > 0: frameCount -= 1
-	screen.fill((0, 0, 0))
-
-	for i in invaders: i.update()
-	if Alien.change: Alien.changeDirection()
-	for b in Alien.bullets: b.update()
-	for b in barricades: b.update()
+		currentScreen.handleInput(e)
 	
-	player.update()
-
-
+	currentScreen.drawScreen(screen)
+	currentScreen = currentScreen.nextScreen()
+	
 	pygame.display.flip()
 	clock.tick(30)
 
 pygame.quit()
 quit()
-
