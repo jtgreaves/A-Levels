@@ -195,7 +195,7 @@ class MainScreen(AbstractScreen):
 
 			if e.key == pygame.K_SPACE and self.frameCount == 0: 
 				self.player.bullets.append(Bullet(650, (self.player.x + 13), 0))
-				self.frameCount = 30
+				self.frameCount = 20
 
 		if e.type == pygame.KEYUP: # Changes direction when a key is released; checks opposing direction's key
 			if e.key == pygame.K_RIGHT:
@@ -206,10 +206,28 @@ class MainScreen(AbstractScreen):
 				else: self.player.dx = 0
 
 	def nextScreen(self):
-		if self.player.lives < 0:
+		if self.player.lives <= 0:
 			return GameOverScreen()
 		return self
-			
+
+class GameOverScreen(AbstractScreen):
+	
+	def __init__(self): 
+		self.replay = False
+		
+	def drawScreen(self, screen):
+		screen.fill((255, 50, 50))
+		titleFont = pygame.font.SysFont('Kristen ITC', 65)
+		title = titleFont.render("Game Over!", True, (0, 0, 0))
+		screen.blit(title, title.get_rect(center=(width//2, 50))) 
+		
+	def nextScreen(self):
+		if self.replay == True: return MainScreen()
+		
+		return self
+	
+	
+		
 endProgram = False
 currentScreen = MainScreen()
 
