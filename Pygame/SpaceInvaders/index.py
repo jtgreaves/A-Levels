@@ -2,6 +2,7 @@ import pygame
 import os
 import random
 import math
+import json
 pygame.init()
 
 width = 1200
@@ -18,11 +19,11 @@ class Alien:
 	change = False #Whether they need to move down & change direction
 	bullets = []
 
-	def __init__(self, x, y, alienType):
+	def __init__(self, x, y, alienType, dead=False):
 		self.imageLoaded = pygame.transform.scale(pygame.image.load(os.path.join(assets_path, alienType+'.png')), (35, 35))
 		self.x = x
 		self.y = y
-		self.dead = False
+		self.dead = dead
 
 
 	def update(self, player):
@@ -50,20 +51,43 @@ class Alien:
 			i.x += Alien.dx
 		Alien.change = False
 		
-	def create(number):
-		n = 0
-		x = 50
-		y = 75
-		invaders = [] 
-		for i in range(number):
-			if n >= 15: # After 15 characters spawned, change rows
-				y += 50
-				x = 50
-				n = 0
+	#def oldCreate(number):
+	#	n = 0
+	#	x = 50
+	#	y = 75
+	#	invaders = [] 
+	#	for i in range(number):
+	#		if n >= 15: # After 15 characters spawned, change rows
+	#			y += 50
+	#			x = 50
+	#			n = 0
+	#
+	#		invaders.append(Alien(x, y, "InvaderA1"))
+	#		x += 50
+	#		n += 1
+	#	return invaders
 	
-			invaders.append(Alien(x, y, "InvaderA1"))
-			x += 50
-			n += 1
+	def create(aliens): 
+		total = 0
+		x = 50 
+		y = 75
+		
+		invaders = []
+		for alien in aliens:
+			if total >= 15: 
+				y += 50 
+				x = 50 
+				total = 0 
+			
+			if alien == 1: invaders.append(Alien(x, y, "InvaderA1"))
+			elif alien == 2: invaders.append(Alien(x, y, "InvaderA2"))
+			elif alien == 3: invaders.append(Alien(x, y, "InvaderB1"))
+			elif alien == 4: invaders.append(Alien(x, y, "InvaderB2"))
+			else: invaders.append(Alien(0, 0, "InvaderA1", True)) # If the alien is dead or an invalid state 
+			
+			x+= 50 
+			total += 1
+		
 		return invaders
 
 class Player:
@@ -169,8 +193,12 @@ class AbstractScreen:
 		
 class MainScreen(AbstractScreen):
 	def __init__(self):
-		self.invaders = Alien.create(30)
-		self.barricades = Barricade.create(1)
+		levelData = self.loadLevel(2)
+		
+		print(levelData)
+		self.name = levelData["levelName"]
+		self.invaders = Alien.create(levelData["invaders"])
+		self.barricades = Barricade.create(levelData["barricades"]) # Temporarily an int 
 		self.player = Player()
 		self.frameCount = 0
 	
@@ -209,6 +237,13 @@ class MainScreen(AbstractScreen):
 		if self.player.lives <= 0:
 			return GameOverScreen()
 		return self
+	
+	def loadLevel(self, level): 
+		jsonFile = open("levels/" + str(level) + ".json")
+		levelData = json.load(jsonFile)
+		jsonFile.close()
+		
+		return levelData 
 
 class GameOverScreen(AbstractScreen):
 	
@@ -225,8 +260,11 @@ class GameOverScreen(AbstractScreen):
 		if self.replay == True: return MainScreen()
 		
 		return self
-	
-	
+
+		
+
+		
+		
 		
 endProgram = False
 currentScreen = MainScreen()
@@ -245,3 +283,4 @@ while endProgram == False:
 
 pygame.quit()
 quit()
+
