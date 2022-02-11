@@ -50,22 +50,6 @@ class Alien:
 			i.y += 25
 			i.x += Alien.dx
 		Alien.change = False
-		
-	#def oldCreate(number):
-	#	n = 0
-	#	x = 50
-	#	y = 75
-	#	invaders = [] 
-	#	for i in range(number):
-	#		if n >= 15: # After 15 characters spawned, change rows
-	#			y += 50
-	#			x = 50
-	#			n = 0
-	#
-	#		invaders.append(Alien(x, y, "InvaderA1"))
-	#		x += 50
-	#		n += 1
-	#	return invaders
 	
 	def create(aliens): 
 		total = 0
@@ -96,7 +80,7 @@ class Player:
 		self.x = width//2
 		self.bullets = []
 		self.dx = 0
-		self.lives = 3
+		self.lives = 10
 
 
 	def update(self):
@@ -184,7 +168,6 @@ class AbstractScreen:
 	def drawScreen(self, screen):
 		pass
 	
-	
 	def handleInput(self, e):
 		pass
 
@@ -193,7 +176,7 @@ class AbstractScreen:
 		
 class MainScreen(AbstractScreen):
 	def __init__(self):
-		levelData = self.loadLevel(2)
+		levelData = self.loadLevel(1)
 		
 		print(levelData)
 		self.name = levelData["levelName"]
@@ -246,7 +229,6 @@ class MainScreen(AbstractScreen):
 		return levelData 
 
 class GameOverScreen(AbstractScreen):
-	
 	def __init__(self): 
 		self.replay = False
 		
@@ -261,11 +243,6 @@ class GameOverScreen(AbstractScreen):
 		
 		return self
 
-		
-
-		
-		
-		
 endProgram = False
 currentScreen = MainScreen()
 

@@ -1,9 +1,18 @@
 import json 
 
+
+invaders = []
+userInput = "" 
+while userInput != "exit": 
+	userInput = input("Exit to stop appending ")
+	if userInput != "exit": invaders.append(int(userInput))
+
+	print(invaders)
+	
 x = {
   "levelName": "Beginner",
-  "invaders": [1, 0, 1, 0, 1, 0, 1], 
-  "barricades": 5
+  "invaders": invaders, 
+  "barricades": 1
 }
 
 jsonObj = json.dumps(x)
