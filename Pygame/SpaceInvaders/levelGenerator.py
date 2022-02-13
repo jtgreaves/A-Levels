@@ -12,15 +12,17 @@ while userInput != "exit":
 
 	print(invaders)
 	
+levelName = input("What is the level's name? ")
+
 x = {
-  "levelName": "Beginner",
+  "levelName": levelName,
   "invaders": invaders, 
-  "barricades": 1
+  "barricades": 1,
+  "lives": 3
 }
 
 jsonObj = json.dumps(x)
 
-levelName = input("What is the level's name? ")
 
 filePath =  os.path.join(levels_path, levelName + ".json")
 

@@ -1,1 +1,1 @@
-{"levelName": "Beginner", "invaders": [3, 2, 1, 0, 2], "barricades": 1}
+{ "levelName": "Beginner", "lives": 3, "invaders": [3, 2, 1, 0, 2], "barricades": 1 }

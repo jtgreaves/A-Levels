@@ -34,15 +34,19 @@ class Alien:
 			self.x += Alien.dx
 			a = screen.blit(self.imageLoaded, (self.x, self.y))
 
-			for b in player.bullets: # Check whether they've been killed
-				if a.collidepoint(b.x, b.y):
-					player.bullets.remove(b)
-					self.dead = True
+			
+			if a.collidepoint(player.bullet.x, player.bullet.y):
+				player.bullet = pygame.Rect(0,0,0,0)
+				self.dead = True
 
 			if self.y > 650: 
 				player.kill(player.lives)
 
-			chance = random.randint(0, 1000)
+			
+			chanceInt = 1000 - 50*(3-len(Alien.bullets))
+			if chanceInt <= -0: chanceInt = 1000 
+			
+			chance = random.randint(0, chanceInt)
 			if chance == 0: Alien.bullets.append(Bullet(self.y, (self.x + 13), 1))
 
 	def changeDirection(invaders):
@@ -76,16 +80,16 @@ class Alien:
 		return invaders
 
 class Player:
-	def __init__(self):
+	def __init__(self, lives):
 		self.imageLoaded = pygame.transform.scale(pygame.image.load(os.path.join(assets_path, 'ship.png')), (35, 35))
 		self.x = width//2
-		self.bullets = []
+		self.bullet = pygame.Rect(0, 0, 0, 0)
 		self.dx = 0
-		self.lives = 3
+		self.lives = lives
 
 
 	def update(self):
-		for b in self.bullets: b.update(self)
+		if self.bullet != pygame.Rect(0, 0, 0, 0): self.bullet.update(self)
 		
 		if self.x + self.dx > 55 and self.x + self.dx < 1100: self.x += self.dx
 		p = screen.blit(self.imageLoaded, (self.x, 650))
@@ -115,7 +119,7 @@ class Bullet:
 	def update(self, player):
 		if self.y > height or self.y < 0:
 			if self.direction == 1: Alien.bullets.remove(self)
-			else: player.bullets.remove(self)
+			else: player.bullet = pygame.Rect(0,0,0,0)
 		if self.direction == 0: self.y += -self.speed
 		else: self.y += self.speed
 		
@@ -156,11 +160,10 @@ class Barricade:
 						self.lines[line][1] -= 10
 						Alien.bullets.remove(b)
 				
-				for b in player.bullets:
-					if ba.collidepoint(b.x+10, b.y+5):
-						self.lines[line][0] -= 10
-						self.lines[line][1] -= 10
-						player.bullets.remove(b)
+				if ba.collidepoint(player.bullet.x+10, player.bullet.y+5):
+					self.lines[line][0] -= 10
+					self.lines[line][1] -= 10
+					player.bullet = pygame.Rect(0,0,0,0)
 				
 			bias += 7
 			line += 1  
@@ -183,15 +186,14 @@ class MainScreen(AbstractScreen):
 		self.name = levelData["levelName"]
 		self.invaders = Alien.create(levelData["invaders"])
 		self.barricades = Barricade.create(levelData["barricades"]) # Temporarily an int 
-		self.player = Player()
-		self.frameCount = 0
+		self.player = Player(levelData["lives"])
 	
 	def drawScreen(self, screen):
 		screen.fill((0, 0, 0))
 		for life in range(self.player.lives):
 			screen.blit(heartImage, (10+(life*40), 10))
 			
-		if self.frameCount > 0: self.frameCount -= 1
+
 		for i in self.invaders: i.update(self.player)
 		if Alien.change: Alien.changeDirection(self.invaders)
 		for b in Alien.bullets: b.update(self.player)
@@ -205,8 +207,8 @@ class MainScreen(AbstractScreen):
 			if e.key == pygame.K_RIGHT: self.player.dx = 7
 			if e.key == pygame.K_LEFT: self.player.dx = -7
 
-			if e.key == pygame.K_SPACE and self.frameCount == 0: 
-				self.player.bullets.append(Bullet(650, (self.player.x + 13), 0))
+			if e.key == pygame.K_SPACE and self.player.bullet == pygame.Rect(0, 0, 0, 0): 
+				self.player.bullet = Bullet(650, (self.player.x + 13), 0)
 				self.frameCount = 20
 
 		if e.type == pygame.KEYUP: # Changes direction when a key is released; checks opposing direction's key
@@ -234,9 +236,9 @@ class GameOverScreen(AbstractScreen):
 		self.replay = False
 		
 	def drawScreen(self, screen):
-		screen.fill((255, 50, 50))
-		titleFont = pygame.font.SysFont('Kristen ITC', 65)
-		title = titleFont.render("Game Over!", True, (0, 0, 0))
+		screen.fill((0, 0, 0))
+		titleFont = pygame.font.SysFont('Courier New', 65)
+		title = titleFont.render("Game Over!", True, (255, 0, 0))
 		screen.blit(title, title.get_rect(center=(width//2, 50))) 
 		
 	def nextScreen(self):
