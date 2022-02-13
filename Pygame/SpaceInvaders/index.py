@@ -12,6 +12,7 @@ clock = pygame.time.Clock()
 
 current_path = os.path.dirname(__file__)
 assets_path = os.path.join(current_path, 'assets')
+levels_path = os.path.join(current_path, 'levels')
 heartImage =  pygame.image.load(os.path.join(assets_path, 'heart.png'))
 
 class Alien:
@@ -80,7 +81,7 @@ class Player:
 		self.x = width//2
 		self.bullets = []
 		self.dx = 0
-		self.lives = 10
+		self.lives = 3
 
 
 	def update(self):
@@ -140,7 +141,7 @@ class Barricade:
 	def create(number):
 		barricades = [] 
 		for n in range(number): 
-			 barricades.append(Barricade(n*50+55, 25)) #Start point & length
+			barricades.append(Barricade(n*50+55, 25)) #Start point & length
 		return barricades
 	
 	def update(self, player):
@@ -176,7 +177,7 @@ class AbstractScreen:
 		
 class MainScreen(AbstractScreen):
 	def __init__(self):
-		levelData = self.loadLevel(1)
+		levelData = self.loadLevel(3)
 		
 		print(levelData)
 		self.name = levelData["levelName"]
@@ -222,7 +223,7 @@ class MainScreen(AbstractScreen):
 		return self
 	
 	def loadLevel(self, level): 
-		jsonFile = open("levels/" + str(level) + ".json")
+		jsonFile = open(os.path.join(levels_path, str(level) + ".json"))
 		levelData = json.load(jsonFile)
 		jsonFile.close()
 		
