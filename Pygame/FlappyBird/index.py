@@ -9,7 +9,6 @@
 # - Could revamp the gameloop, to support a wider range of screens (see TicTacToe)
 # - Show (and store) the highscored
 # - Show the reason for the gameover (floor/pipe)
-# By Joshua Greaves 
 
 import pygame 
 import random 
