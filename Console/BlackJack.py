@@ -1,6 +1,4 @@
-import random # used for chances 
-import re # used for regex
-import time # used for sleeping / waiting 
+import random, re, time
 
 def scoreCalc(card, player): #The card to score & whether it is the player or not
 	if re.match("[0-9]", card[1]): #If the card is a number  
@@ -26,8 +24,7 @@ def scoreCalc(card, player): #The card to score & whether it is the player or no
 				except: # Display an error message 
 					print("Sorry! That value was not accepted \nPlease enter either 1 or 11!")
 					print(UserInput)
-		else: # Temporary computer algorithm
-                        
+		else: # Temporary computer algorithm  
 			compChoice = random.randint(0, 1) # 50/50 chance whether the computer decides to pick 1/11 with Ace
 			if compChoice == 1: 
 				score = 11
